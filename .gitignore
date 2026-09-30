@@ -1,0 +1,4 @@
+ds-editor.backup-*/
+node_modules/
+.DS_Store
+Thumbs.db

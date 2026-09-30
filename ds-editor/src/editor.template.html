@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEXLESS Design System Editor</title>
+<style>
+:root{
+  --e-bg:#101114;--e-panel:#16171b;--e-panel2:#1d1f24;--e-line:#2a2c32;--e-line2:#373a42;
+  --e-text:#eceef2;--e-mute:#9a9ea8;--e-dim:#6d717b;--e-acc:#4f7cff;--e-acc2:rgba(79,124,255,.16);--e-warn:#ffb547;--e-ovr:#ffb547;
+  --e-font:system-ui,-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;--e-mono:ui-monospace,"JetBrains Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--e-bg);color:var(--e-text);font:13px/1.45 var(--e-font);overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+button:disabled{opacity:.35;cursor:default}
+:focus-visible{outline:2px solid var(--e-acc);outline-offset:1px}
+code,kbd{font-family:var(--e-mono);font-size:11px}
+kbd{border:1px solid var(--e-line2);border-radius:4px;padding:0 4px;background:var(--e-panel2)}
+.muted{color:var(--e-mute)}.small{font-size:11.5px}.pad{padding:6px 10px}.mt4{margin-top:4px}.mt8{margin-top:8px}.row{display:flex;align-items:center}.gap6{gap:6px}
+svg.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- top bar ---------- */
+.top{height:48px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--e-line);background:var(--e-panel)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.2px;margin-right:6px}
+.logo i{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#4f7cff,#8aa6ff);display:grid;place-items:center;font-style:normal;font-size:11px;color:#fff}
+.logo small{font-weight:500;color:var(--e-mute)}
+.sp{flex:1}
+.tbtn{height:30px;padding:0 10px;border-radius:7px;border:1px solid var(--e-line2);background:var(--e-panel2);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.tbtn:hover:not(:disabled){border-color:var(--e-mute)}
+.tbtn.primary{background:var(--e-acc);border-color:var(--e-acc);color:#fff;font-weight:600}
+.tbtn.on{background:var(--e-acc2);border-color:var(--e-acc);color:#cfdaff}
+.menu{position:absolute;top:44px;right:12px;width:280px;background:var(--e-panel2);border:1px solid var(--e-line2);border-radius:10px;padding:6px;box-shadow:0 18px 40px rgba(0,0,0,.5);z-index:20}
+.menu button{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:7px}
+.menu button:hover{background:var(--e-line)}
+.menu button small{display:block;color:var(--e-mute);font-size:11px}
+.menu hr{border:0;border-top:1px solid var(--e-line);margin:4px 0}
+
+/* ---------- layout ---------- */
+.main{display:grid;grid-template-columns:272px minmax(0,1fr) 360px;height:calc(100% - 48px)}
+.panel{background:var(--e-panel);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--e-line2) transparent}
+#left{border-right:1px solid var(--e-line);padding:10px 8px 30px}
+#right{border-left:1px solid var(--e-line);padding:0 0 40px}
+
+/* ---------- left ---------- */
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--e-mute);padding:6px 8px}
+.sec-h .muted{text-transform:none;letter-spacing:0;font-weight:500}
+.comp{border-radius:8px;margin-bottom:2px}
+.comp.active{background:rgba(79,124,255,.06)}
+.comp-h{display:flex;align-items:center;gap:6px;width:100%;padding:7px 8px;border-radius:7px;text-align:left}
+.comp-h:hover{background:var(--e-panel2)}
+.comp-h .zh{color:var(--e-mute);font-size:12px}
+.chev{display:inline-block;width:10px;color:var(--e-dim);transition:transform .15s}.chev.o{transform:rotate(90deg)}
+.cnt{margin-left:auto;font:11px var(--e-mono);color:var(--e-dim)}
+.var{display:flex;align-items:center;margin:1px 0 1px 18px}
+.var-h{flex:1;display:flex;align-items:center;padding:5px 8px;border-radius:6px;text-align:left;min-width:0}
+.var-h em{font-style:normal;font:10.5px var(--e-mono);color:var(--e-mute);border:1px solid var(--e-line2);border-radius:4px;padding:0 4px;margin-left:4px}
+.var-h:hover,.var-x:hover{background:var(--e-panel2)}
+.var.on .var-h{background:var(--e-acc2);color:#dbe4ff}
+.var-x{width:24px;height:24px;border-radius:6px;color:var(--e-dim)}.var-x.o{color:var(--e-acc)}
+.insts{margin:2px 0 6px 26px;border-left:1px solid var(--e-line);padding-left:4px}
+.inst{display:flex;align-items:center;gap:6px;width:100%;padding:4px 6px;border-radius:6px;text-align:left;font-size:12px;min-width:0}
+.inst span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.inst small{color:var(--e-dim);font-size:10.5px;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+.inst:hover{background:var(--e-panel2)}.inst.on{background:var(--e-acc2)}.inst.hid{opacity:.55}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--e-ovr);flex:none;display:inline-block}
+.tok-g{display:flex;width:100%;padding:7px 8px;border-radius:7px;text-align:left}
+.tok-g:hover{background:var(--e-panel2)}.tok-g.on{background:var(--e-acc2);color:#dbe4ff}
+
+/* ---------- center ---------- */
+.center{display:flex;flex-direction:column;min-width:0;background:#0a0b0d}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--e-line);flex-wrap:wrap;background:var(--e-panel)}
+.seg{display:inline-flex;background:var(--e-panel2);border:1px solid var(--e-line2);border-radius:7px;padding:2px}
+.seg button{padding:3px 9px;border-radius:5px;color:var(--e-mute);font-size:12px;white-space:nowrap}
+.seg button.on{background:var(--e-line2);color:var(--e-text)}
+#stateSeg button.on[data-v=tilt]{background:#5a2140;color:#ffc0df}
+.bar select{height:28px;background:var(--e-panel2);border:1px solid var(--e-line2);border-radius:7px;padding:0 8px;max-width:230px}
+#zoomLbl{font:11px var(--e-mono);color:var(--e-dim);min-width:34px}
+#stage{flex:1;overflow:auto;padding:16px;position:relative}
+#frameWrap{margin:0 auto;position:relative;box-shadow:0 0 0 1px var(--e-line2),0 20px 60px rgba(0,0,0,.5);border-radius:6px;overflow:hidden}
+#preview{border:0;display:block;transform-origin:0 0;background:#0b0c0e}
+
+/* ---------- right ---------- */
+.empty{padding:28px 20px;color:var(--e-mute);line-height:1.7}
+.empty .big{color:var(--e-text);font-size:16px;font-weight:600;margin-bottom:6px}
+.empty ul{margin-top:14px;padding-left:18px}.empty li{margin-bottom:6px}
+.sel-h{padding:14px 16px 12px;border-bottom:1px solid var(--e-line)}
+.crumbs{font-size:12px;color:var(--e-mute)}.crumbs span{color:var(--e-dim);margin:0 3px}
+.sel-t{font-size:15px;font-weight:600;margin:4px 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovr{color:var(--e-ovr)}
+.mini{height:24px;padding:0 8px;border-radius:6px;border:1px solid var(--e-line2);background:var(--e-panel2);font-size:11.5px;color:var(--e-mute)}
+.mini:hover{color:var(--e-text);border-color:var(--e-mute)}
+.scope{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 16px 0}
+.scope button{border:1px solid var(--e-line2);border-radius:8px;padding:8px 10px;text-align:left;background:var(--e-panel2)}
+.scope button b{display:block;font-size:12.5px}
+.scope button small{color:var(--e-mute);font-size:11px}
+.scope button.on{border-color:var(--e-acc);background:var(--e-acc2)}
+.scope button.on[data-mode=instance]{border-color:var(--e-ovr);background:rgba(255,181,71,.10)}
+.note{margin:10px 16px 0;padding:8px 10px;border-radius:7px;background:var(--e-panel2);color:var(--e-mute);font-size:11.5px;line-height:1.55}
+.note code{color:var(--e-text)}.note b{color:var(--e-text)}
+.note.warn{color:var(--e-warn)}
+.link{color:#9db4ff;text-decoration:underline;text-underline-offset:2px;margin-left:4px;font-size:11.5px}
+.grp{padding:12px 16px 4px;border-top:1px solid var(--e-line);margin-top:12px}
+.grp-h{display:flex;flex-direction:column;margin-bottom:8px}
+.grp-h b{font-size:12.5px}.grp-h span{font-size:11px;color:var(--e-dim)}
+.prop{padding:6px 0 8px;border-bottom:1px dashed var(--e-line)}
+.prop:last-child{border-bottom:0}
+.pl{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12px;min-width:0}
+.pl code{margin-left:auto;color:var(--e-dim);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.prop.ovr .pl>span:first-child{color:var(--e-ovr)}
+.prop.ovr .pl>span:first-child:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--e-ovr);margin-right:5px;vertical-align:2px}
+.st{font-size:10px;border:1px solid var(--e-line2);border-radius:4px;padding:0 4px;color:var(--e-mute)}
+.rst{width:18px;height:18px;border-radius:4px;color:var(--e-mute);font-size:12px;line-height:1}
+.rst:hover{background:var(--e-line);color:var(--e-text)}
+.ctl{display:flex;align-items:center;gap:6px}
+.ctl input.txt,.ctl select{height:28px;min-width:0;background:var(--e-bg);border:1px solid var(--e-line2);border-radius:6px;padding:0 7px;font:11.5px var(--e-mono)}
+.ctl select{font-family:var(--e-font);font-size:12px;flex:1}
+.ctl input.txt{flex:1}.ctl input.wide{width:100%}
+.ctl input.txt::placeholder{color:var(--e-dim);font-family:var(--e-font)}
+.ctl input.txt:focus,.ctl select:focus{border-color:var(--e-acc);outline:none}
+.color .sw{position:relative;width:28px;height:28px;border-radius:6px;flex:none;border:1px solid var(--e-line2);background:linear-gradient(var(--c),var(--c)),repeating-conic-gradient(#555 0 25%,#333 0 50%) 0 0/10px 10px;overflow:hidden;cursor:pointer}
+.color .sw input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.color .tok{flex:0 0 72px;font-size:11px}
+.color .alpha{width:46px;flex:none}
+.len input[type=range]{flex:1;min-width:0;accent-color:var(--e-acc)}
+.len input.txt{flex:0 0 124px}
+.len .res{font:10.5px var(--e-mono);color:var(--e-dim);min-width:34px}
+.shadow select{flex:0 0 100px}
+.both{display:block;margin-top:4px;font:10.5px var(--e-mono);color:var(--e-dim)}
+.icon-slot{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.icon-slot .lbl{width:52px;font-size:12px;color:var(--e-mute)}
+.icon-btn{flex:1;height:30px;display:flex;align-items:center;gap:8px;padding:0 8px;border:1px solid var(--e-line2);border-radius:6px;background:var(--e-bg);text-align:left}
+.icon-btn .caret{margin-left:auto;color:var(--e-dim)}
+.icon-pop{margin-top:8px;border:1px solid var(--e-line2);border-radius:8px;background:var(--e-panel2);padding:8px}
+.ip-h{font-size:11px;color:var(--e-mute);margin-bottom:6px}
+.ip-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ip-g button{height:32px;border-radius:6px;display:grid;place-items:center;border:1px solid transparent}
+.ip-g button:hover{background:var(--e-line);border-color:var(--e-line2)}
+.ip-g .ip-w{grid-column:span 7;height:26px;justify-content:start;padding:0 8px;display:flex}
+.danger{width:100%;height:30px;border:1px solid #5a2a2a;border-radius:7px;color:#ff9c9c;margin-bottom:12px}
+.danger:hover{background:rgba(255,80,80,.08)}
+
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#2a2d35;border:1px solid var(--e-line2);padding:8px 14px;border-radius:8px;opacity:0;transition:.2s;pointer-events:none;z-index:50}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#help{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:40;padding:20px}
+#help[hidden]{display:none}
+#help .box{width:min(720px,100%);max-height:86vh;overflow:auto;background:var(--e-panel);border:1px solid var(--e-line2);border-radius:12px;padding:22px 26px;line-height:1.7}
+#help h2{font-size:18px;margin-bottom:10px}#help h3{font-size:13.5px;margin:16px 0 4px}
+#help ol,#help ul{padding-left:20px;color:#cfd2da}
+#help .close{float:right}
+/* ---------- tabs / save ---------- */
+#tabSeg{margin-right:4px}
+#tabSeg button{padding:4px 12px;font-size:12.5px}
+#tabSeg button.on{background:var(--e-acc);color:#fff}
+#savedLbl{font-size:11px;color:var(--e-dim);min-width:70px}
+.center[hidden]{display:none}
+#libCenter .bar input{height:28px;background:var(--e-panel2);border:1px solid var(--e-line2);border-radius:7px;padding:0 9px;width:220px}
+#libFrame{flex:1;border:0;width:100%;display:block;background:#0a0b0d}
+
+/* ---------- component panel & placed list ---------- */
+.sec-t{display:inline-flex;align-items:center;gap:4px;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;padding:0}
+.pal{padding:0 4px 4px}
+.pal-q{width:100%;height:28px;background:var(--e-bg);border:1px solid var(--e-line2);border-radius:6px;padding:0 8px;margin:2px 0 6px;font-size:12px}
+.pal-q:focus{border-color:var(--e-acc);outline:none}
+.pal-cat{font-size:10.5px;color:var(--e-dim);letter-spacing:.5px;text-transform:uppercase;margin:8px 4px 3px}
+.pal-it{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--e-line);border-radius:7px;margin-bottom:3px;background:var(--e-panel2);cursor:grab;user-select:none;touch-action:none;font-size:12px;min-width:0}
+.pal-it:hover{border-color:var(--e-acc);background:rgba(79,124,255,.08)}
+.pal-it .grip{color:var(--e-dim);font-size:12px}
+.pal-it b{font-weight:600;white-space:nowrap}
+.pal-it .sub{color:var(--e-mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pal-it em{margin-left:auto;font-style:normal;font-size:10px;border-radius:4px;padding:0 5px;background:rgba(61,220,151,.14);color:#9ff0c9}
+.pal-it em.g{background:rgba(255,181,71,.12);color:#ffcf8a}
+.pal-it[hidden],.pal-cat[hidden]{display:none}
+.dot.g{background:#3ddc97}
+body.dragging,body.dragging *{cursor:grabbing!important}
+#ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;background:#2a2d35;border:1px solid var(--e-line2);color:var(--e-text);padding:5px 10px;border-radius:7px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap}
+#ghost.ok{background:#1f9d68;border-color:#3ddc97}
+#ghost[hidden]{display:none}
+.grp.placed{border-top:0;margin-top:0;background:rgba(61,220,151,.05);border-bottom:1px solid var(--e-line)}
+.grp.placed .grp-h b{color:#9ff0c9}
+textarea.txt{width:100%;background:var(--e-bg);border:1px solid var(--e-line2);border-radius:6px;padding:6px 7px;font:11.5px/1.5 var(--e-mono);resize:vertical}
+textarea.txt:focus{border-color:var(--e-acc);outline:none}
+.fld-l{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--e-mute);margin-top:8px}
+.fld-l input.txt,.fld-l select{height:30px;background:var(--e-bg);border:1px solid var(--e-line2);border-radius:6px;padding:0 8px;font-size:13px;color:var(--e-text)}
+.fld-l input.txt:focus,.fld-l select:focus{border-color:var(--e-acc);outline:none}
+#libSize button{font-size:11.5px}
+
+/* ---------- dialog ---------- */
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:45;padding:20px}
+#dlg[hidden]{display:none}
+#dlg .box{width:min(560px,100%);max-height:86vh;overflow:auto;background:var(--e-panel);border:1px solid var(--e-line2);border-radius:12px;padding:20px 22px;line-height:1.6}
+#dlg h3{font-size:15.5px;margin-bottom:8px}
+#dlg p{margin:6px 0;font-size:12.5px}
+#dlg .warn{color:var(--e-warn)}
+#dlg ul.imp{margin:6px 0 8px 18px;font-size:12.5px}
+.dlg-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.dlg-acts .sp{flex:1}
+.danger-btn{background:#5a2323;border-color:#8a3434;color:#ffd0d0}
+.base-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.base-it{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;border:1px solid var(--e-line2);border-radius:9px;padding:10px 12px;background:var(--e-panel2)}
+.base-it:hover{border-color:var(--e-acc);background:var(--e-acc2)}
+.base-it span{color:var(--e-mute);font-size:12px}.base-it small{color:var(--e-dim);font-size:11px}
+@media(max-width:1100px){.main{grid-template-columns:220px minmax(0,1fr) 300px}}
+</style>
+</head>
+<body>
+<div id="spriteHost" style="position:absolute;width:0;height:0;overflow:hidden"></div>
+<header class="top">
+  <div class="logo"><i>DS</i>DEXLESS Design System <small>Editor</small></div>
+  <div class="seg" id="tabSeg"><button data-v="preview" class="on">頁面編輯</button><button data-v="library">元件庫</button></div>
+  <button class="tbtn" id="bUndo" title="復原 (Ctrl+Z)">↶ 復原</button>
+  <button class="tbtn" id="bRedo" title="重做 (Ctrl+Shift+Z)">↷ 重做</button>
+  <button class="tbtn" id="bSave" title="儲存 (Ctrl+S)">儲存</button>
+  <span id="savedLbl"></span>
+  <span class="sp"></span>
+  <button class="tbtn" id="bHelp">? 操作說明</button>
+  <button class="tbtn" id="bResetAll" title="全部還原為原始狀態">重設</button>
+  <button class="tbtn primary" id="bExport">匯出 ▾</button>
+  <div class="menu" id="exportMenu" hidden>
+    <button data-x="html">HTML + CSS<small>dexless.html ＋ design-system.css（兩個檔案）</small></button>
+    <button data-x="single">單一 HTML 檔<small>CSS 內嵌，可直接雙擊開啟</small></button>
+    <button data-x="css">只匯出 design-system.css</button>
+    <button data-x="tokens">tokens.json<small>所有設計設定與元件 token</small></button>
+    <hr>
+    <button data-x="json">儲存編輯設定（.json）<small>日後可再匯入繼續編輯</small></button>
+    <button data-x="import">匯入編輯設定…</button>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+</header>
+<div class="main">
+  <aside class="panel" id="left"><div class="muted pad">載入中…</div></aside>
+  <section class="center" id="previewCenter">
+    <div class="bar">
+      <button class="tbtn on" id="bPick" title="選取模式 (V)">⌖ 選取模式</button>
+      <select id="pageSel" title="切換 demo 頁面"></select>
+      <div class="seg" id="themeSeg"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></div>
+      <div class="seg" id="stateSeg"><button data-v="stable" class="on">Stable</button><button data-v="tilt">Unstable</button></div>
+      <span class="sp"></span>
+      <div class="seg" id="widthSeg" title="預覽寬度"><button data-v="1440" class="on">1440</button><button data-v="1024">1024</button><button data-v="390">390</button></div>
+      <div class="seg" id="zoomSeg"><button data-v="fit" class="on">縮放以符合</button><button data-v="100">100%</button></div>
+      <span id="zoomLbl"></span>
+    </div>
+    <div id="stage"><div id="frameWrap"><iframe id="preview" title="Demo 預覽"></iframe></div></div>
+  </section>
+  <section class="center" id="libCenter" hidden>
+    <div class="bar">
+      <div class="seg" id="libThemeSeg" title="預覽主題"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></div>
+      <input id="libQ" placeholder="搜尋元件或變體…">
+      <span class="sp"></span>
+      <button class="tbtn" id="bLibReport">盤點報告</button>
+      <button class="tbtn primary" id="bAddComp">＋ 新增元件</button>
+    </div>
+    <iframe id="libFrame" title="元件庫"></iframe>
+  </section>
+  <aside class="panel" id="right"></aside>
+</div>
+<div id="toast"></div>
+<div id="ghost" hidden></div>
+<div id="dlg" hidden><div class="box"></div></div>
+<div id="help" hidden><div class="box">
+  <button class="tbtn close">關閉</button>
+  <h2>操作說明</h2>
+  <h3>0. 元件庫與拖曳新增</h3>
+  <ul><li>上方切換「頁面編輯 / 元件庫」。元件庫列出 demo 中實際存在的所有元件（依類型分類），每張卡片有即時外觀、尺寸、顏色、字體、圓角、內距、狀態切換，以及在 demo 中的使用位置與數量。</li>
+  <li>點選卡片即可在右側修改名稱與樣式；修改會同步到頁面上所有使用該元件 / 變體的實例。每個元件的標題列可以「＋ 變體」「⧉ 複製元件」「✎ 重新命名」「刪除」；左側「＋ 新增元件」會先讓你選擇基礎類型，再命名與設定起始樣式。刪除前會列出受影響的頁面實例。</li>
+  <li>頁面編輯左側的「元件面板」可以把元件拖到頁面上：綠色線條代表插入到某個元素的前方 / 後方，綠色框代表放入容器內部。放置後可以修改文字、icon、內容與變體，用 ↑ ↓ / 移出容器或直接拖曳來移動，按 <kbd>Delete</kbd> 刪除。</li>
+  <li>「儲存」（<kbd>Ctrl+S</kbd>）存到這個瀏覽器；「重設」還原全部。匯出的 HTML 內含放置的元件與元件庫樣式，可獨立開啟。</li></ul>
+  <h3>1. 選取元件</h3>
+  <ul><li>「⌖ 選取模式」開啟時（快捷鍵 <kbd>V</kbd>），在預覽中點到元件（按鈕、標籤、卡片…）只會選取、不會觸發它原本的互動；點到非元件區域（彈窗遮罩、關閉鈕、導覽連結）則照常運作。</li>
+  <li>關閉選取模式即可正常操作 demo（切頁、開啟 Agent 視窗、下拉選單…）；此時按住 <kbd>Alt</kbd> 點擊仍可選取。</li>
+  <li>左側清單列出每個元件的變體與「本頁可見 / 全部」數量，點變體可直接選取，按 ≡ 展開所有實例（會自動切換到該實例所在頁面）。</li>
+  <li>「↖ 外層」可從按鈕跳到外層的卡片等元件。</li></ul>
+  <h3>2. 修改整個變體 vs 只改這個實例</h3>
+  <ul><li><b>修改整個變體</b>：改的是 token（寫入 design-system.css），所有同變體元件同步更新，預覽中以藍框標示受影響的實例。設定分三層：<i>變體樣式</i>（例如 Primary）、<i>尺寸</i>（md / sm，不分變體）、<i>元件共用</i>。</li>
+  <li><b>只改這個實例</b>：只影響選取的那一個（橘色標示已覆寫欄位，↺ 還原單一欄位）。即使 demo 重新渲染該區塊也會自動套回。</li>
+  <li>顏色類設定依主題分開：在 Dark 時修改只影響 Dark，切到 Light 再調整 Light 的值。實例覆寫不分主題。</li></ul>
+  <h3>3. Icon</h3>
+  <ul><li>Button 可設定左 / 右 icon：選擇圖示新增或替換、✕ 移除、⇄ 左右互換。</li>
+  <li>變體模式下「保持原樣」代表沿用每顆按鈕原本的 icon。</li></ul>
+  <h3>4. 設計設定</h3>
+  <ul><li>左側「設計設定」可修改全站顏色、字體、圓角、間距、陰影，所有引用的元件即時更新。</li></ul>
+  <h3>5. 儲存與匯出</h3>
+  <ul><li>編輯內容會自動存在這個瀏覽器；<kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Shift+Z</kbd> 復原與重做。</li>
+  <li>「匯出」可下載 dexless.html + design-system.css、單一 HTML 檔、tokens.json，或儲存編輯設定檔以便之後匯入。</li></ul>
+</div></div>
+<script>/*DS_CORE*/</script>
+<script>/*DS_DATA*/</script>
+<script>/*DS_EDITOR*/</script>
+</body>
+</html>
